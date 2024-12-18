@@ -1,0 +1,6 @@
+[submodule "REDBattle"]
+	path = REDBattle
+	url = https://github.com/WistfulHopes/REDBattle.git
+[submodule "SDL_image"]
+	path = SDL_image
+	url = https://github.com/libsdl-org/SDL_image.git
