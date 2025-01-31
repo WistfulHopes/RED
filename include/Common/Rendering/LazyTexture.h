@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <string>
-#include <SDL3/SDL_render.h>
+
+struct SDL_GPUTexture;
+struct SDL_Surface;
 
 class LazyTexture
 {
@@ -9,15 +11,18 @@ public:
 
     ~LazyTexture();
 
-    bool Load(std::string filename);
-    bool Load(SDL_IOStream* mem);
+    bool Load(const std::string& filename);
+    bool Load(struct SDL_IOStream* mem);
     void Destroy();
 
     int GetWidth() const;
     int GetHeight() const;
-
+    SDL_Surface* GetSurface() const;
+    SDL_GPUTexture* GetTexture() const;
+    
 private:
-    SDL_Texture* texture;
+    SDL_Surface* surface;
+    SDL_GPUTexture* texture;
 
     int width;
     int height;

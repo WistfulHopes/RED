@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.15...3.31)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(
-	RED 
-	VERSION 0.1.0 
-	DESCRIPTION "Open source implementation of Arc System Works' battle engine" 
+	RED
+	VERSION 0.1.0
+	DESCRIPTION "Open source implementation of Arc System Works' battle engine"
 	LANGUAGES CXX)
 
 set (CMAKE_CXX_STANDARD 23)
@@ -78,7 +80,7 @@ add_recursive( ./src SOURCES )
 
 add_executable(RED ${SOURCES} ${HEADERS})
 target_include_directories(RED PUBLIC include)
-target_link_libraries(RED PRIVATE SDL3::SDL3 REDBattle SDL_image)
+target_link_libraries(RED PRIVATE SDL3::SDL3 REDBattle SDL3_image::SDL3_image)
 
 add_custom_command(
         TARGET RED POST_BUILD
@@ -91,6 +93,11 @@ if(WIN32)
     add_custom_command(
         TARGET RED POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3::SDL3-shared> $<TARGET_FILE_DIR:RED>
+        VERBATIM
+    )
+    add_custom_command(
+        TARGET RED POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3_image::SDL3_image-shared> $<TARGET_FILE_DIR:RED>
         VERBATIM
     )
 endif()

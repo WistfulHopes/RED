@@ -11,15 +11,13 @@ namespace
 {
     void LoadCharaData(std::string chara_id, int idx)
     {
-        const auto base_path = std::string(SDL_GetBasePath());
-    
         size_t bbs_size = 0;
-        auto bbs_data = (uint8_t*)SDL_LoadFile((base_path + std::format("assets/BBS_{}.bbsbin", chara_id)).c_str(), &bbs_size);
+        auto bbs_data = (uint8_t*)GameCommon::LoadAsset(std::format("assets/BBS_{}.bbsbin", chara_id), &bbs_size);
     
         size_t ef_bbs_size = 0;
-        auto ef_bbs_data = (uint8_t*)SDL_LoadFile((base_path + std::format("assets/BBS_{}EF.bbsbin", chara_id)).c_str(), &ef_bbs_size);
+        auto ef_bbs_data = (uint8_t*)GameCommon::LoadAsset(std::format("assets/BBS_{}EF.bbsbin", chara_id), &ef_bbs_size);
     
-        auto col_data = (uint8_t*)SDL_LoadFile((base_path + std::format("assets/COL_{}.pac", chara_id)).c_str(), nullptr);
+        auto col_data = (uint8_t*)GameCommon::LoadAsset(std::format("assets/COL_{}.pac", chara_id), nullptr);
 
         REDGameCommon::GetInstance()->LoadCharaData(bbs_data, bbs_size, ef_bbs_data, ef_bbs_size, col_data, idx);
     }
@@ -36,14 +34,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     }
 
     auto game_common = new GameCommon();
-    if (!game_common) return SDL_APP_FAILURE;
+    if (!game_common || !game_common->initialized) return SDL_APP_FAILURE;
     *appstate = game_common;
-    
-    if (!SDL_CreateWindowAndRenderer("RED", 1920, 1080, 0, &game_common->window, &game_common->renderer))
-    {
-        SDL_Log("SDL_CreateWindowAndRenderer failed: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
     
     LoadCharaData("SOL", 0);
     LoadCharaData("DMY", 1);
@@ -82,9 +74,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     {
         game_common->scene_id = REDGameCommon::GetInstance()->GetSceneID();
     }
-    
-    SDL_RenderClear(game_common->renderer);
-    SDL_RenderPresent(game_common->renderer);
+
+    game_common->Update();
     
     return SDL_APP_CONTINUE;
 }
