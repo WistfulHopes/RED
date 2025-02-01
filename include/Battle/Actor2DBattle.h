@@ -12,5 +12,5 @@ public:
 
     void LoadSprites() override;
     void Draw(SDL_GPUCommandBuffer* cmd_buf, SDL_GPUTexture* swapchain_texture, SDL_GPURenderPass* render_pass) override;
-    PositionTextureVertex* GetCoords() override;
+    std::array<PositionTextureVertex, 4> GetCoords() override;
 };

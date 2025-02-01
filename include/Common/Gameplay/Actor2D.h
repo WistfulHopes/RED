@@ -20,7 +20,7 @@ public:
     ~Actor2D() override;
 
     virtual void LoadSprites() = 0;
-    virtual PositionTextureVertex* GetCoords() = 0;
+    virtual std::array<PositionTextureVertex, 4> GetCoords() = 0;
     
     bool SetSprite(const char* img_name);
 

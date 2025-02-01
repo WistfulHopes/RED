@@ -1,5 +1,7 @@
 ﻿#include "Battle/Actor2DBattle.h"
 
+#include <array>
+
 #include "GameCommon.h"
 #include "Common/Rendering/LazyTexture.h"
 #include "Game/Battle/Object/obj_base.h"
@@ -38,12 +40,12 @@ void Actor2DBattle::Draw(struct SDL_GPUCommandBuffer* cmd_buf, struct SDL_GPUTex
     Actor2D::Draw(cmd_buf, swapchain_texture, render_pass);
 }
 
-PositionTextureVertex* Actor2DBattle::GetCoords()
+std::array<PositionTextureVertex, 4> Actor2DBattle::GetCoords()
 {
     auto scene = dynamic_cast<SCENE_CBattle*>(REDGameCommon::GetInstance()->GetScene());
     const auto linkMagn = scene->GetBattleScreenManager()->GetLinkMagn() * 0.001f;
 
-    PositionTextureVertex vertices[4]{};
+    std::array<PositionTextureVertex, 4> vertices{};
 
     float dest_x = obj->m_ClsnAnalyzer.GetViewWorldRect(0).m_X * 1000.f;
     float dest_y = obj->m_ClsnAnalyzer.GetViewWorldRect(0).m_Y * 1000.f;

@@ -37,8 +37,6 @@ bool Actor2D::SetSprite(const char* img_name)
 
     if (static_cast<int>(idx) == -1) return false;
 
-    strcpy(cur_sprite_name, img_name);
-
     const auto offset = img_pac.GetPackOffsetAddr(idx);
     const auto size = img_pac.GetPackOffsetFileSize(idx);
 
@@ -67,7 +65,7 @@ void Actor2D::Draw(SDL_GPUCommandBuffer* cmd_buf, SDL_GPUTexture* swapchain_text
                static_cast<uint32_t>(texture->GetWidth() * texture->GetHeight() * 4));
     RenderManager::UnmapGPUTransferBuffer(texture_transfer_buffer);
 
-    PositionTextureVertex* transfer_data = static_cast<PositionTextureVertex*>(RenderManager::MapGPUTransferBuffer(
+    auto transfer_data = static_cast<PositionTextureVertex*>(RenderManager::MapGPUTransferBuffer(
         buffer_transfer_buffer, false));
 
     auto coords = GetCoords();
@@ -77,7 +75,7 @@ void Actor2D::Draw(SDL_GPUCommandBuffer* cmd_buf, SDL_GPUTexture* swapchain_text
     transfer_data[2] = coords[2];
     transfer_data[3] = coords[3];
 
-    Uint16* index_data = (Uint16*)&transfer_data[4];
+    auto index_data = (Uint16*)&transfer_data[4];
     index_data[0] = 0;
     index_data[1] = 1;
     index_data[2] = 2;
