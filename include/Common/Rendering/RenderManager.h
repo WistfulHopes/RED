@@ -2,7 +2,11 @@
 #include <string>
 #include <SDL3/SDL_gpu.h>
 
-#define SHADER_SUPPORTED_FORMATS (SDL_GPU_SHADERFORMAT_MSL | SDL_GPU_SHADERFORMAT_DXBC | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_SPIRV)
+#ifdef _WIN32
+#define SHADER_SUPPORTED_FORMATS (SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXBC | SDL_GPU_SHADERFORMAT_DXIL)
+#elif __linux__ 
+#define SHADER_SUPPORTED_FORMATS (SDL_GPU_SHADERFORMAT_SPIRV)
+#endif
 
 struct PositionTextureVertex
 {
@@ -16,6 +20,8 @@ public:
     static void Init();
     static void Destroy();
 
+    static void Draw();
+    
     static SDL_GPUShader* CreateShader(const std::string& shader_filename, uint32_t sampler_count,
                                        uint32_t uniform_buffer_count,
                                        uint32_t storage_buffer_count, uint32_t storage_texture_count);
@@ -34,7 +40,10 @@ public:
     
     static void ReleaseShader(SDL_GPUShader* shader);
     static void ReleaseTexture(SDL_GPUTexture* texture);
+    static void ReleaseSampler(SDL_GPUSampler* texture);
     static void ReleaseGPUTransferBuffer(SDL_GPUTransferBuffer* transfer_buffer);
+    static void ReleaseBuffer(SDL_GPUBuffer* buffer);
+    static void ReleaseGPUGraphicsPipeline(SDL_GPUGraphicsPipeline* pipeline);
 
 private:
     static inline SDL_GPUDevice* gpu_device{};

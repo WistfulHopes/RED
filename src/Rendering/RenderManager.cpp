@@ -13,9 +13,32 @@ void RenderManager::Destroy()
     SDL_DestroyGPUDevice(gpu_device);
 }
 
+void RenderManager::Draw()
+{
+    auto cmd_buf = AcquireCommandBuffer();
+
+    if (!cmd_buf)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "AcquireGPUCommandBuffer failed: %s", SDL_GetError());
+        return;
+    }
+
+    SDL_GPUTexture* swapchain_texture;
+    if (!SDL_WaitAndAcquireGPUSwapchainTexture(cmd_buf, GameCommon::window, &swapchain_texture, nullptr, nullptr))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "WaitAndAcquireGPUSwapchainTexture failed: %s", SDL_GetError());
+        return;
+    }
+
+    if (swapchain_texture)
+        GameCommon::Draw(cmd_buf, swapchain_texture);
+    
+    SDL_SubmitGPUCommandBuffer(cmd_buf);
+}
+
 void RenderManager::Init()
 {
-    gpu_device = SDL_CreateGPUDevice(SHADER_SUPPORTED_FORMATS, false, SDL_GetHint(SDL_HINT_GPU_DRIVER));
+    gpu_device = SDL_CreateGPUDevice(SHADER_SUPPORTED_FORMATS, false, nullptr);
     CHECK_CREATE(gpu_device, "GPU device")
 
     SDL_ClaimWindowForGPUDevice(gpu_device, GameCommon::window);
@@ -31,7 +54,7 @@ SDL_GPUShader* RenderManager::CreateShader(const std::string& shader_filename, u
     else if (shader_filename.contains(".frag")) stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
     else
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, std::format("Invalid shader stage for {}", shader_filename).c_str());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, std::format("Invalid shader stage for {}", shader_filename).c_str());
         return nullptr;
     }
 
@@ -70,7 +93,7 @@ SDL_GPUShader* RenderManager::CreateShader(const std::string& shader_filename, u
 
     if (!code)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, std::format("Failed to load {}", shader_filename).c_str());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, std::format("Failed to load {}", shader_path).c_str());
         return nullptr;
     }
 
@@ -89,7 +112,7 @@ SDL_GPUShader* RenderManager::CreateShader(const std::string& shader_filename, u
     SDL_GPUShader* shader = SDL_CreateGPUShader(gpu_device, &shader_info);
     if (!shader)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, std::format("Failed to create shader {}", shader_filename).c_str());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, std::format("Failed to create shader {}", shader_path).c_str());
         SDL_free(code);
         return nullptr;
     }
@@ -153,7 +176,22 @@ void RenderManager::ReleaseTexture(SDL_GPUTexture* texture)
     SDL_ReleaseGPUTexture(gpu_device, texture);
 }
 
+void RenderManager::ReleaseSampler(SDL_GPUSampler* sampler)
+{
+    SDL_ReleaseGPUSampler(gpu_device, sampler);
+}
+
 void RenderManager::ReleaseGPUTransferBuffer(SDL_GPUTransferBuffer* transfer_buffer)
 {
     SDL_ReleaseGPUTransferBuffer(gpu_device, transfer_buffer);
+}
+
+void RenderManager::ReleaseBuffer(SDL_GPUBuffer* buffer)
+{
+    SDL_ReleaseGPUBuffer(gpu_device, buffer);
+}
+
+void RenderManager::ReleaseGPUGraphicsPipeline(SDL_GPUGraphicsPipeline* pipeline)
+{
+    SDL_ReleaseGPUGraphicsPipeline(gpu_device, pipeline);
 }

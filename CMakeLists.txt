@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.15...3.31)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(
 	RED
@@ -8,7 +7,9 @@ project(
 	DESCRIPTION "Open source implementation of Arc System Works' battle engine"
 	LANGUAGES CXX)
 
-set (CMAKE_CXX_STANDARD 23)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 23)
+set(SDLIMAGE_VENDORED ON)
 
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
@@ -80,12 +81,18 @@ add_recursive( ./src SOURCES )
 
 add_executable(RED ${SOURCES} ${HEADERS})
 target_include_directories(RED PUBLIC include)
-target_link_libraries(RED PRIVATE SDL3::SDL3 REDBattle SDL3_image::SDL3_image)
+target_link_libraries(RED PRIVATE REDBattle SDL3_image::SDL3_image SDL3::SDL3)
 
 add_custom_command(
         TARGET RED POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 ${CMAKE_SOURCE_DIR}/REDBattle/assets/
+                $<TARGET_FILE_DIR:RED>/assets/
+)
+add_custom_command(
+        TARGET RED POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/assets/
                 $<TARGET_FILE_DIR:RED>/assets/
 )
 

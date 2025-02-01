@@ -72,10 +72,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     if (game_common->scene_id != REDGameCommon::GetInstance()->GetSceneID())
     {
-        game_common->scene_id = REDGameCommon::GetInstance()->GetSceneID();
+        game_common->ChangeGameState(REDGameCommon::GetInstance()->GetSceneID());
     }
 
-    game_common->Update();
+    RenderManager::Draw();
     
     return SDL_APP_CONTINUE;
 }

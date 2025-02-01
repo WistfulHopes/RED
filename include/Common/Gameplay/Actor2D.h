@@ -8,25 +8,27 @@
 class LazyTexture;
 struct SDL_GPUShader;
 
-class Actor2D : Actor
+class Actor2D : public Actor
 {
 protected:
     AA_Filepack_FPAC img_pac{};
     char cur_sprite_name[0x20]{};
     std::unordered_map<std::string, LazyTexture*> textures{};
-    struct SDL_GPUSampler* sampler;
 
 public:
-    Actor2D() = default;
-    virtual ~Actor2D() override;
+    Actor2D();
+    ~Actor2D() override;
 
     virtual void LoadSprites() = 0;
     virtual PositionTextureVertex* GetCoords() = 0;
-
+    
     bool SetSprite(const char* img_name);
 
-    void Draw() override;
+    void Draw(SDL_GPUCommandBuffer* cmd_buf, SDL_GPUTexture* swapchain_texture, SDL_GPURenderPass* render_pass) override;
 
 private:
     bool InitGPU();
+    
+    SDL_GPUTransferBuffer* buffer_transfer_buffer;
+    SDL_GPUSampler* sampler;
 };
